@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tank Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F4F7F3;--card:#fff;--ink:#1E2A23;--mute:#5F6F65;--sage:#4F7461;--soft:#DCE8DF;--blush:#D98F7F;--line:#CFDCD3;--empty:#E3877B;--half:#E6C158;--full:#74AE87;--on:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#131A16;--card:#1C2621;--ink:#E8F0EA;--mute:#9DB0A3;--sage:#7FB094;--soft:#27362E;--line:#2F4036;--on:#10170F}}
+:root[data-theme="dark"]{--bg:#131A16;--card:#1C2621;--ink:#E8F0EA;--mute:#9DB0A3;--sage:#7FB094;--soft:#27362E;--line:#2F4036;--on:#10170F}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "DM Sans",system-ui,sans-serif;padding-bottom:84px}
+main{max-width:560px;margin:0 auto;padding:16px}
+h1,h2{font-family:Fraunces,Georgia,serif;margin:0}h1{font-size:26px}h2{font-size:20px;margin:22px 0 10px}
+.sub{color:var(--mute);margin:2px 0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:12px 0}
+.hero{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:6px 0 10px}
+.tank{position:relative;height:150px;border:3px solid var(--sage);border-radius:22px;overflow:hidden;background:var(--card)}
+.water{position:absolute;left:0;right:0;bottom:0;height:50%;background:var(--half);transition:height .35s,background .35s}
+.tl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1E2A23}
+.tl b{font:700 44px Fraunces,Georgia,serif;line-height:1}.tl span{font-size:14px}.tl em{font-style:normal;font-weight:700;margin-top:4px;background:rgba(255,255,255,.75);padding:2px 12px;border-radius:99px}
+.say{margin:8px 2px 0;color:var(--mute)}
+.sl label{display:flex;justify-content:space-between;font-weight:700}.sl small{display:block;color:var(--mute);font-weight:400;font-size:13px}
+.sl b.v{font:700 22px Fraunces,Georgia,serif;color:var(--sage)}.sl{margin:10px 0 16px}
+input[type=range]{width:100%;height:36px;accent-color:var(--sage)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+button{font:inherit;color:var(--ink);cursor:pointer}
+.chip{border:1.5px solid var(--line);background:var(--card);border-radius:99px;padding:9px 14px;min-height:44px}
+.chip.on,.opt.on{background:var(--sage);color:var(--on);border-color:var(--sage)}
+.nd{display:block;font-size:12px;opacity:.8}
+.opt{display:block;width:100%;text-align:left;border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:12px 14px;margin:6px 0;min-height:48px}
+.btn{width:100%;border:0;background:var(--sage);color:var(--on);font-weight:700;border-radius:14px;padding:15px;margin-top:12px;font-size:17px}
+.btn.alt{background:var(--soft);color:var(--ink)}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.bar{display:flex;align-items:center;gap:10px;margin:7px 0;font-size:14px}.bar>span:first-child{width:92px;flex:none}
+.bar i{display:block;height:14px;border-radius:7px;background:var(--sage);min-width:3px}.bar .t{flex:1;background:var(--soft);border-radius:7px}.bar>span:last-child{width:84px;text-align:right;flex:none;color:var(--mute)}
+.stat{display:flex;flex-wrap:wrap;gap:10px}.stat div{flex:1 1 40%;background:var(--soft);border-radius:12px;padding:10px;text-align:center}.stat b{display:block;font:700 22px Fraunces,Georgia,serif}.stat span{font-size:12px;color:var(--mute)}
+.empty{color:var(--mute)}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;border:0;background:none;padding:14px 4px;font-weight:500;color:var(--mute)}nav button.on{color:var(--sage);font-weight:700;box-shadow:inset 0 3px 0 var(--sage)}
+textarea{width:100%;height:90px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px;font:12px monospace}
+#toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;opacity:0;transition:opacity .25s;pointer-events:none}#toast.show{opacity:1}
+.dnav{align-items:center;margin:6px 0 0}.dnav input{font:inherit;min-height:44px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);padding:0 10px;text-align:center}.dnav .chip{flex:none;width:48px;padding:0;font-size:22px}.dnav .chip:disabled{opacity:.35}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){.water,#toast{transition:none}}
+</style>
+</head>
+<body>
+<main>
+<section id="v-checkin">
+<h1>Tank Check</h1>
+<div class="row dnav"><button class="chip" id="prev" aria-label="Previous day">‹</button><input type="date" id="dpick" aria-label="Check-in date"><button class="chip" id="next" aria-label="Next day">›</button></div><p class="sub" id="dnote"></p>
+<div class="hero"><div class="tank"><div class="water" id="water"></div><div class="tl"><b id="ts">15</b><span>out of 30</span><em id="tt">Half tank</em></div></div><p class="say" id="say"></p></div>
+<div class="card" id="sliders"></div>
+<h2>What do I need?</h2><div class="chips" id="needs"></div>
+<div id="ideasWrap"><h2 id="ih">Ideas</h2><div id="ideas"></div></div>
+<button class="btn" id="save">Save check-in</button>
+<div class="card" id="helpBox" hidden><b>Did it help?</b><div class="row" style="margin-top:8px" id="helpBtns"></div></div>
+</section>
+<section id="v-patterns" hidden><h1>My patterns</h1><p class="sub" id="pSub"></p><div id="pBody"></div></section>
+<section id="v-more" hidden>
+<h1>Backup and settings</h1>
+<p class="sub">Your check-ins are saved on this device only. Copy a backup now and then, especially before switching phones.</p>
+<div class="card"><b>Copy backup</b><textarea id="bk" readonly></textarea><button class="btn" id="copy">Copy backup</button></div>
+<div class="card"><b>Restore from backup</b><textarea id="rs" placeholder="Paste your backup here"></textarea><button class="btn alt" id="restore">Restore</button></div>
+<div class="card"><b>Erase all check-ins</b><p class="sub">This cannot be undone.</p><button class="btn alt" id="erase">Erase everything</button></div>
+<p class="sub">Tank Check is a self-reflection tool, not a substitute for professional care.</p>
+</section>
+</main>
+<nav><button id="n-checkin" class="on">Check in</button><button id="n-patterns">Patterns</button><button id="n-more">Backup</button></nav>
+<div id="toast"></div>
+<script>
+const NEEDS=[["Regulate","I need to settle"],["Activate","I need momentum"],["Reset","My space is creating friction"],["Express","Something needs somewhere to go"],["Connect","I need people or support"],["Nourish","I need to meet a basic need"],["Delight","I need something that feels good"]];
+const CB={Regulate:["Meditate for 5 minutes","Meditate for 10 minutes","Do nothing for 5 minutes","Do nothing for 10 minutes","5-minute breathing exercise","Sit outside","Journal for 5 minutes","Journal for 10 minutes","Listen to one calming song","Take a sensory break for 5 minutes","Sit somewhere quiet","Step outside and notice your surroundings","Take a warm shower","Put your phone away for 10 minutes"],
+Activate:["Take a walk for 5 minutes","Take a run for 30 minutes","Stretch for 5 minutes","Do one yoga flow","Dance to one song","Do a short strength session","Go outside","Take a shower","Get dressed","Make your bed","Put on music and move around","Do the smallest version of the task you're avoiding","Set a 10-minute timer and start","Change locations"],
+Reset:["Clear one surface","Make the bed","Wash the dishes","Take out the trash","Reset the kitchen","Put away 10 things","Clean your workspace","Change your sheets","Take a shower and change clothes","Delete/close unnecessary tabs","Clean out your bag","Put things back where they belong","Do a 10-minute room reset"],
+Express:["Free-write for 10 minutes","Journal without editing yourself","Record a voice memo","Write the message you aren't ready to send","Talk out loud to yourself","Draw or doodle","Make something","Write a poem","Dance it out","Cry if you need to","Make a playlist for what you're feeling","Talk to someone you trust","Finish the sentence: “What I really want to say is…”"],
+Connect:["Text someone you trust","Call a friend","Ask someone to hang out","Sit with your partner/family","Send someone a voice note","Ask for help with something specific","Have a conversation you've been avoiding","Go somewhere you enjoy being around people","Attend a community/social activity","Check in on someone you care about","Spend intentional, phone-free time with someone","Tell someone what you actually need from them"],
+Nourish:["Drink a glass of water","Eat something substantial","Make yourself a nourishing meal","Have a snack","Take your medications as prescribed","Go outside for some daylight","Take a nap/rest","Go to bed earlier","Take a shower","Put on comfortable clothes","Take a screen break","Give yourself an actual meal break","Check whether you're hungry, thirsty, tired, or overstimulated"],
+Delight:["Put on your favorite album","Watch something genuinely funny","Wear an outfit you love","Make your favorite drink","Cook something fun","Read for pleasure","Play a game","Do your makeup/hair just because","Sit somewhere beautiful","Buy yourself a small treat within your budget","Look at art/design/fashion that inspires you","Do a hobby with no productive outcome","Revisit something that makes you laugh","Take yourself somewhere you enjoy","Make something purely because you want to"]};
+const SL=[["m","Mood","How emotionally available do I feel right now?"],["o","Motion","How physically available am I today?"],["s","Mindset","How mentally available am I to engage with what's in front of me?"]];
+const SAY={Empty:"Go small today. The tiniest version of any idea counts.",Half:"Pick one idea, do it, and let that be enough.",Full:"You have room for the bigger version, or two ideas."};
+const $=s=>document.querySelector(s),KEY="tankcheck.v1";
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const typ=t=>t<=15?"Empty":t<=23?"Half":"Full";
+const tot=e=>e.m+e.o+e.s,avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:0;
+let store=[];try{store=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){toast("Saving is blocked in this browser. Copy a backup instead.")}}
+function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),2200)}
+const fmt=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const T=fmt(new Date());let D=T;
+let cur={m:5,o:5,s:5,need:"",care:""};
+$("#sliders").innerHTML=SL.map(([k,n,q])=>`<div class="sl"><label for="r${k}"><span>${n}<small>${q}</small></span><b class="v" id="v${k}"></b></label><input type="range" id="r${k}" min="0" max="10" step="1"></div>`).join("");
+SL.forEach(([k])=>{const r=$("#r"+k);r.value=cur[k];r.oninput=()=>{cur[k]=+r.value;tank()}});
+function tank(){const t=cur.m+cur.o+cur.s,y=typ(t);SL.forEach(([k])=>$("#v"+k).textContent=cur[k]);
+$("#ts").textContent=t;$("#tt").textContent=y+" tank";$("#say").textContent=SAY[y];
+const w=$("#water");w.style.height=Math.max(t/30*100,4)+"%";w.style.background=y=="Empty"?"var(--empty)":y=="Half"?"var(--half)":"var(--full)"}
+function needs(){$("#needs").innerHTML=NEEDS.map(([n,d])=>`<button class="chip${cur.need===n?" on":""}" data-n="${n}">${n}<span class="nd">${d}</span></button>`).join("");
+document.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{cur.need=cur.need===b.dataset.n?"":b.dataset.n;cur.care="";needs();ideas()})}
+function ideas(){const w=$("#ideasWrap");w.hidden=!cur.need;if(!cur.need)return;
+$("#ih").textContent="Ideas for "+cur.need+". Pick one.";
+$("#ideas").innerHTML=CB[cur.need].map((a,i)=>`<button class="opt${cur.care===a?" on":""}" data-i="${i}">${esc(a)}</button>`).join("");
+document.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{cur.care=CB[cur.need][+b.dataset.i];ideas()})}
+function help(){const e=store.find(x=>x.d===D);$("#helpBox").hidden=!(e&&e.care);if(!e)return;
+$("#helpBtns").innerHTML=["Yes","Somewhat","No"].map(h=>`<button class="chip${e.help===h?" on":""}" data-h="${h}">${h}</button>`).join("");
+document.querySelectorAll("[data-h]").forEach(b=>b.onclick=()=>{e.help=b.dataset.h;persist();help();toast("Saved")})}
+$("#save").onclick=()=>{const old=store.find(e=>e.d===D),n={d:D,m:cur.m,o:cur.o,s:cur.s,need:cur.need,care:cur.care,help:old&&old.care===cur.care?old.help||"":""};
+store=store.filter(e=>e.d!==D);store.push(n);store.sort((a,b)=>a.d<b.d?-1:1);persist();$("#save").textContent="Update check-in";help();toast("Check-in saved")};
+function loadDay(){const e=store.find(x=>x.d===D);cur=e?{m:e.m,o:e.o,s:e.s,need:e.need||"",care:e.care||""}:{m:5,o:5,s:5,need:"",care:""};
+SL.forEach(([k])=>$("#r"+k).value=cur[k]);$("#save").textContent=e?"Update check-in":"Save check-in";
+$("#dpick").value=D;$("#next").disabled=D>=T;
+$("#dnote").textContent=new Date(D+"T00:00").toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"})+(D===T?" (today)":" (past day: you can add or update it)");
+tank();needs();ideas();help()}
+function shift(n){const d=new Date(D+"T00:00");d.setDate(d.getDate()+n);const x=fmt(d);if(x>T)return;D=x;loadDay()}
+$("#dpick").max=T;$("#dpick").onchange=function(){if(this.value&&this.value<=T){D=this.value;loadDay()}else this.value=D};
+$("#prev").onclick=()=>shift(-1);$("#next").onclick=()=>shift(1);loadDay();
+function bar(l,v,max,t){return`<div class="bar"><span>${l}</span><span class="t"><i style="width:${max?Math.round(v/max*100):0}%"></i></span><span>${t}</span></div>`}
+function rate(a){const r=a.filter(e=>e.help);return r.length?(r.filter(e=>e.help=="Yes").length+.5*r.filter(e=>e.help=="Somewhat").length)/r.length:null}
+function streaks(){const ds=[...new Set(store.map(e=>Date.parse(e.d+"T00:00:00Z")/864e5))].sort((a,b)=>a-b);let best=0,run=0,prev=null;
+ds.forEach(x=>{run=prev!==null&&x-prev===1?run+1:1;prev=x;if(run>best)best=run});
+const tn=Date.parse(T+"T00:00:00Z")/864e5;return[ds.length&&tn-prev<=1?run:0,best]}
+function patterns(){const n=store.length;$("#pSub").textContent=n?"Based on "+n+" check-in"+(n>1?"s":"")+". "+(n<7?(7-n)+" more until day-of-week patterns unlock.":""):"";
+if(!n){$("#pBody").innerHTML='<div class="card empty">No check-ins yet. Do your first one and your patterns will start building here.</div>';return}
+const [cs,bs]=streaks();
+let h=`<div class="stat"><div><b>${n}</b><span>days logged</span></div><div><b>${avg(store.map(tot)).toFixed(1)}</b><span>average score</span></div><div><b>${cs}</b><span>current streak (days)</span></div><div><b>${bs}</b><span>longest streak (days)</span></div></div>`;
+h+="<h2>Tank types</h2>";["Empty","Half","Full"].forEach(t=>{const c=store.filter(e=>typ(tot(e))==t).length;h+=bar(t,c,n,c+" ("+Math.round(c/n*100)+"%)")});
+h+="<h2>Average by area</h2>"+SL.map(([k,nm])=>bar(nm,avg(store.map(e=>e[k])),10,avg(store.map(e=>e[k])).toFixed(1))).join("");
+h+="<h2>By day of the week</h2>";
+if(n<7)h+='<p class="empty">Unlocks after 7 check-ins.</p>';else{const names=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];[1,2,3,4,5,6,0].forEach(d=>{const a=store.filter(e=>new Date(e.d+"T00:00").getDay()===d).map(tot);h+=bar(names[d],avg(a),30,a.length?avg(a).toFixed(1)+" ("+a.length+")":"none")})}
+h+="<h2>What you need</h2>";const wn=store.filter(e=>e.need);
+if(!wn.length)h+='<p class="empty">Pick a need on a check-in to see this.</p>';else{const mx=Math.max(...NEEDS.map(([x])=>wn.filter(e=>e.need==x).length));NEEDS.forEach(([x])=>{const a=wn.filter(e=>e.need==x),r=rate(a);h+=bar(x,a.length,mx,a.length+(r===null?"":" · "+Math.round(r*100)+"% helped"))})}
+const m={};store.filter(e=>e.care).forEach(e=>{const o=m[e.care]=m[e.care]||[];o.push(e)});const L=Object.entries(m);
+h+="<h2>Activities you choose most</h2>";
+if(!L.length)h+='<p class="empty">Pick an idea on a check-in to see this.</p>';else{const t=L.sort((a,b)=>b[1].length-a[1].length).slice(0,5);t.forEach(([k,a])=>{const r=rate(a);h+=bar(esc(k),a.length,t[0][1].length,a.length+"x"+(r===null?"":" · "+Math.round(r*100)+"%"))})}
+const hp=L.filter(([k,a])=>a.filter(e=>e.help).length>=2).map(([k,a])=>[k,a,rate(a)]).sort((a,b)=>b[2]-a[2]||b[1].length-a[1].length).slice(0,5);
+h+="<h2>Activities that help most</h2>";h+=hp.length?hp.map(([k,a,r])=>bar(esc(k),r,1,Math.round(r*100)+"% helped")).join(""):'<p class="empty">Rate an activity at least twice to see this.</p>';
+h+='<p class="empty" style="font-size:13px;margin-top:14px">Helped rate: Yes counts as 1, Somewhat as half, No as 0.</p>';
+$("#pBody").innerHTML=h}
+function view(v){["checkin","patterns","more"].forEach(x=>{$("#v-"+x).hidden=x!==v;$("#n-"+x).classList.toggle("on",x===v)});if(v=="patterns")patterns();if(v=="more")$("#bk").value=JSON.stringify(store);window.scrollTo(0,0)}
+["checkin","patterns","more"].forEach(x=>$("#n-"+x).onclick=()=>view(x));
+$("#copy").onclick=()=>{const t=$("#bk");t.value=JSON.stringify(store);t.select();let ok=false;try{ok=document.execCommand("copy")}catch(e){}
+if(navigator.clipboard)navigator.clipboard.writeText(t.value).then(()=>toast("Backup copied"),()=>toast(ok?"Backup copied":"Press and hold the text to copy it"));else toast(ok?"Backup copied":"Press and hold the text to copy it")};
+$("#restore").onclick=()=>{try{const a=JSON.parse($("#rs").value);if(!Array.isArray(a))throw 0;const ok=a.filter(e=>e&&/^\d{4}-\d{2}-\d{2}$/.test(e.d)&&["m","o","s"].every(k=>Number.isInteger(e[k])&&e[k]>=0&&e[k]<=10)).map(e=>({d:e.d,m:e.m,o:e.o,s:e.s,need:NEEDS.some(n=>n[0]===e.need)?e.need:"",care:typeof e.care==="string"?e.care.slice(0,120):"",help:["Yes","Somewhat","No"].includes(e.help)?e.help:""}));
+if(!ok.length)throw 0;const mp={};store.concat(ok).forEach(e=>mp[e.d]=e);store=Object.values(mp).sort((a,b)=>a.d<b.d?-1:1);persist();toast("Restored "+ok.length+" check-ins");$("#rs").value=""}catch(e){toast("That backup could not be read")}};
+let armed=false;$("#erase").onclick=function(){if(!armed){armed=true;this.textContent="Tap again to erase everything";setTimeout(()=>{armed=false;this.textContent="Erase everything"},4000);return}
+store=[];persist();armed=false;this.textContent="Erase everything";toast("All check-ins erased")};
+</script>
+</body>
+</html>
